@@ -6,6 +6,7 @@
 #' @param tooltips character, named vector of tooltips for elements in the tree, Default: NULL
 #' @param nodestate boolean, vector the length of obj that initializes tree open to true values, Default: NULL
 #' @param ... parameters that are passed to the vcs package (see details)
+#' @param plugins List of jsTree plugins to use (by default 'search' and 'checkbox'; see \url{https://www.jstree.com/plugins/})
 #' @param width,height Must be a valid CSS unit (like \code{'100\%'},
 #'   \code{'400px'}, \code{'auto'}) or a number, which will be coerced to a
 #'   string and have \code{'px'} appended.
@@ -84,7 +85,8 @@
 #' @import htmlwidgets
 #' @importFrom jsonlite toJSON
 #' @export
-jsTree <- function(obj, core=NULL, tooltips=NULL, nodestate=NULL, ... , width = NULL, height = NULL, elementId = NULL) {
+jsTree <- function(obj, core=NULL, tooltips=NULL, nodestate=NULL, ... , plugins = c('search', 'checkbox'), 
+                   width = NULL, height = NULL, elementId = NULL) {
 
   preview.search <- NULL
   
@@ -116,7 +118,8 @@ jsTree <- function(obj, core=NULL, tooltips=NULL, nodestate=NULL, ... , width = 
   
   # forward options using x
   x <- list(core = jsonlite::toJSON(c(list(data=obj.in),core),auto_unbox = TRUE),
-            vcs = vcs)
+            vcs = vcs,
+            plugins = as.array(plugins))
   
   if( 'preview.search'%in%names(match.call()) ) x$forcekey <- preview.search
   

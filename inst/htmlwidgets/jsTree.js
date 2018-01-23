@@ -94,8 +94,14 @@ HTMLWidgets.widget({
                   previewDiv.appendChild(searchInputPreview);
   
       //define the tree plugins
-        var treePlugins=['search','checkbox'];
-        if(x.uri&&x.vcs!='svn') treePlugins.push('contextmenu');
+      var treePlugins;
+      if(x.plugins){
+        treePlugins=x.plugins;
+      } else{
+        //default
+        treePlugins=['search','checkbox'];
+      } 
+      if(x.uri && x.vcs!='svn') treePlugins.push('contextmenu');
   
 
       //create the tree    
