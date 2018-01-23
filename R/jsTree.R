@@ -1,6 +1,7 @@
 #' @title Htmlwidget for the jsTree Javascript library
 #' @description Htmlwidget for the jsTree Javascript library
-#' @param obj character, vector of directory tree
+#' @param obj character vector (slash-delimited paths comprising the tree) or data frame 
+#' (containing parent and child term names in first two columns)
 #' @param core list, additional parameters to pass to core of jsTree, default: NULL
 #' @param tooltips character, named vector of tooltips for elements in the tree, Default: NULL
 #' @param nodestate boolean, vector the length of obj that initializes tree open to true values, Default: NULL
@@ -93,16 +94,25 @@ jsTree <- function(obj, core=NULL, tooltips=NULL, nodestate=NULL, ... , width = 
   if(!'vcs'%in%names(match.call())) vcs <- 'github'
   if(!'remote_branch'%in%names(match.call())) remote_branch <- 'master'
   
-  obj.in <- nest(l       = obj,
-               root      = ifelse(!is.null(remote_repo),
-                                  ifelse(vcs=='svn',
-                                         remote_repo,
-                                         paste(remote_repo,remote_branch,sep='/')
-                                         ),
-                                  '.'),
-               nodestate = nodestate,
-               tooltips  = tooltips
-               )
+  if(is.character(obj)){
+    obj.in <- nest(l       = obj,
+                   root      = ifelse(!is.null(remote_repo),
+                                      ifelse(vcs=='svn',
+                                             remote_repo,
+                                             paste(remote_repo,remote_branch,sep='/')
+                                      ),
+                                      '.'),
+                   nodestate = nodestate,
+                   tooltips  = tooltips
+    )
+  } else if(is.data.frame(obj)){
+    obj.in <- makeAdjList(l = obj,
+                   nodestate = nodestate,
+                   tooltips  = tooltips)
+  } else {
+    stop("Expected character vector or data.frame; got", class(obj))
+  }
+
   
   # forward options using x
   x <- list(core = jsonlite::toJSON(c(list(data=obj.in),core),auto_unbox = TRUE),
